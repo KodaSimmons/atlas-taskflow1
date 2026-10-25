@@ -1,0 +1,96 @@
+name: Build, test and deploy to Azure
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: "8.0.x"
+  # The App Service name, set as a repository variable (Settings > Secrets and variables > Actions > Variables).
+  AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=results.trx" --results-directory test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results
+
+      - name: Publish
+        run: dotnet publish src/AtlasTaskFlow/AtlasTaskFlow.csproj --configuration Release --no-build --output publish
+
+      - name: Upload app package
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-app
+          path: publish
+
+  deploy:
+    # Only deploy from main, and only once the Azure settings exist in the repo.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.AZURE_WEBAPP_NAME != ''
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.webapp-url }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: atlas-app
+          path: publish
+
+      - name: Deploy to Azure App Service
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: publish
+
+      - name: Post-deployment smoke test
+        env:
+          SITE: ${{ steps.deploy.outputs.webapp-url }}
+        run: |
+          set -e
+          # The first request after a deploy can be slow while the app starts, so retry for up to ~3 minutes.
+          for i in $(seq 1 18); do
+            if curl -fsS "$SITE/health" | grep -q Healthy; then break; fi
+            echo "Waiting for the app to start ($i)..."; sleep 10
+          done
+          check() {
+            code=$(curl -s -o page.html -w "%{http_code}" "$SITE$1")
+            echo "$1 -> $code"
+            test "$code" = "200"
+            grep -q "$2" page.html
+          }
+          check "/health" "Healthy"
+          check "/" "Atlas TaskFlow"
+          check "/Tasks" "Tasks"
+          check "/Projects" "Spring Campaign Launch"
+          check "/Team" "Brightside Marketing"
+          code=$(curl -s -o /dev/null -w "%{http_code}" "$SITE/Tasks/Details/999999")
+          echo "/Tasks/Details/999999 -> $code (expected 404)"
+          test "$code" = "404"
+          echo "Smoke test passed for $SITE"

@@ -19,6 +19,7 @@ builder.Services.AddSingleton(_ =>
 });
 builder.Services.AddSingleton<TaskWorkflowService>();
 builder.Services.AddScoped<CurrentUserContext>();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -37,6 +38,9 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// Lightweight endpoint for the post-deployment smoke test and Azure health checks.
+app.MapHealthChecks("/health");
 
 app.MapControllerRoute(
     name: "default",

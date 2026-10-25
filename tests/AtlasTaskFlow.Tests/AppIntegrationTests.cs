@@ -228,6 +228,12 @@ public partial class AppIntegrationTests : IDisposable
     }
 
     [Fact]
+    public async Task HealthEndpoint_ReportsHealthy()
+    {
+        Assert.Equal("Healthy", await _client.GetStringAsync("/health"));
+    }
+
+    [Fact]
     public async Task NotificationSummary_ReturnsUnreadCount()
     {
         var json = await _client.GetStringAsync("/Notifications/Summary");
