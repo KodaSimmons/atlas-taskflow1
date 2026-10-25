@@ -18,6 +18,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Check roadmap rules
+        run: |
+          python3 scripts/roadmap-lint.py
+          python3 scripts/roadmap-lint.py --self-test
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
