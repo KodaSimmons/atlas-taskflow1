@@ -98,6 +98,6 @@ The assignment defers these to later sprints, so they are stubbed or left out:
 
 - [Roadmap](roadmap/ROADMAP.md): what's planned, what state it's in, decisions and Koda's rulings
 
-- [Deployment guide](docs/DEPLOYMENT.md): setting up Azure App Service and the GitHub Actions deploy
+
 - [Testing evidence](docs/TESTING.md): what was tested before and after deployment, with results
 - [Development log](docs/DEV-LOG.md): problems hit during the build and how they were solved
