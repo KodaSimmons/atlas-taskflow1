@@ -1,0 +1,18 @@
+@model int
+@{
+    ViewData["Title"] = Model == 404 ? "Not found" : "Something went wrong";
+}
+<div class="empty-state my-5">
+    <div class="display-5 fw-bold text-body-secondary">@Model</div>
+    @if (Model == 404)
+    {
+        <h1 class="h4 mt-2">We couldn't find that page</h1>
+        <p>It may have been deleted, or it belongs to a different team than the one you're viewing.</p>
+    }
+    else
+    {
+        <h1 class="h4 mt-2">Something went wrong</h1>
+        <p>Please try again.</p>
+    }
+    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">Back to dashboard</a>
+</div>

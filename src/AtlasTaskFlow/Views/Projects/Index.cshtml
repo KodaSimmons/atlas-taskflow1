@@ -1,0 +1,38 @@
+@model IReadOnlyList<ProjectSummary>
+@inject CurrentUserContext Current
+@{
+    ViewData["Title"] = "Projects";
+}
+<div class="page-head">
+    <div>
+        <h1>Projects</h1>
+        <p class="text-body-secondary mb-0">Every task belongs to a project. Quick tasks go in the default Tasks project.</p>
+    </div>
+    @if (Current.CanManage)
+    {
+        <a class="btn btn-primary" asp-action="Create">+ New project</a>
+    }
+</div>
+
+<div class="row g-3">
+    @foreach (var p in Model)
+    {
+        <div class="col-sm-6 col-lg-4">
+            <a class="panel project-card h-100" asp-action="Details" asp-route-id="@p.Project.ProjectId">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                    <h2 class="h5 mb-1">@p.Project.ProjectName</h2>
+                    @if (p.Project.IsDefaultTasksProject)
+                    {
+                        <span class="badge text-bg-light border">Default</span>
+                    }
+                </div>
+                <p class="small text-body-secondary">@(p.Project.Description ?? "No description.")</p>
+                <div class="progress mb-2" role="progressbar" aria-label="@p.Project.ProjectName progress"
+                     aria-valuenow="@p.PercentComplete" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar" style="width: @p.PercentComplete%"></div>
+                </div>
+                <div class="small text-body-secondary">@p.CompletedTasks of @p.TotalTasks tasks completed · @p.OpenTasks open</div>
+            </a>
+        </div>
+    }
+</div>

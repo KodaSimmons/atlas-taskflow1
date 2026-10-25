@@ -1,0 +1,208 @@
+@model TaskDetailsViewModel
+@inject CurrentUserContext Current
+@{
+    ViewData["Title"] = Model.Task.Title;
+    var t = Model.Task;
+    var overdue = t.IsOverdue(DateTime.Today);
+    var statuses = Enum.GetValues<TaskItemStatus>();
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Index">Projects</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Projects" asp-action="Details" asp-route-id="@Model.Project.ProjectId">@Model.Project.ProjectName</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Task</li>
+    </ol>
+</nav>
+
+<div class="page-head">
+    <div>
+        <h1>@t.Title</h1>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <partial name="_StatusBadge" model="t.Status" />
+            <span class="@(overdue ? "text-danger fw-semibold" : "text-body-secondary")">
+                @(overdue ? "Overdue, was due" : "Due") @t.DueDate.ToString("dddd, MMM d")
+            </span>
+        </div>
+    </div>
+    @if (Model.CanManage)
+    {
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" asp-action="Edit" asp-route-id="@t.TaskId">Edit</a>
+            <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@t.TaskId">Delete</a>
+        </div>
+    }
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        @* The main next step for whoever is looking at the task. *@
+        @if (t.Status == TaskItemStatus.NotAssigned)
+        {
+            <section class="panel panel-highlight">
+                <h2 class="h6">Nobody is working on this yet</h2>
+                <p class="text-body-secondary">Pick it up and it will be assigned to you.</p>
+                <form method="post" asp-action="PickUp" asp-route-id="@t.TaskId">
+                    <button class="btn btn-primary">Pick up this task</button>
+                </form>
+            </section>
+        }
+        else if (Model.IsAssignee && t.Status == TaskItemStatus.Assigned)
+        {
+            <section class="panel panel-highlight">
+                <h2 class="h6">Ready to start?</h2>
+                <form method="post" asp-action="ChangeStatus" asp-route-id="@t.TaskId">
+                    <input type="hidden" name="status" value="@TaskItemStatus.InProgress" />
+                    <button class="btn btn-primary">Start working</button>
+                </form>
+            </section>
+        }
+        else if (Model.IsAssignee && t.Status == TaskItemStatus.InProgress)
+        {
+            <section class="panel panel-highlight" id="submit">
+                <h2 class="h6">Submit your work</h2>
+                <p class="text-body-secondary small">Attach your finished files. The task moves to Needs Review and your team leader is notified.</p>
+                <form method="post" asp-action="Submit" asp-route-id="@t.TaskId" enctype="multipart/form-data">
+                    <div class="mb-2">
+                        <label for="files" class="form-label">Deliverable files <span class="text-body-secondary small">(up to 5, 5 MB each)</span></label>
+                        <input class="form-control" type="file" id="files" name="files" multiple required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Note for your leader <span class="text-body-secondary small">(optional)</span></label>
+                        <textarea class="form-control" id="note" name="note" rows="2" maxlength="1000"></textarea>
+                    </div>
+                    <button class="btn btn-primary">Submit files</button>
+                </form>
+            </section>
+        }
+        else if (t.Status == TaskItemStatus.NeedsReview && Model.CanManage)
+        {
+            <section class="panel panel-highlight">
+                <h2 class="h6">This work is waiting for your review</h2>
+                <p class="text-body-secondary small">Check the submitted files below, then approve or send it back with feedback.</p>
+                <div class="d-flex flex-wrap gap-2 align-items-start">
+                    <form method="post" asp-action="ChangeStatus" asp-route-id="@t.TaskId">
+                        <input type="hidden" name="status" value="@TaskItemStatus.Completed" />
+                        <button class="btn btn-success">Approve and complete</button>
+                    </form>
+                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#changes">Request changes</button>
+                </div>
+                <form method="post" asp-action="RequestChanges" asp-route-id="@t.TaskId" class="collapse mt-3" id="changes">
+                    <label for="feedback" class="form-label">What needs to change?</label>
+                    <textarea class="form-control mb-2" id="feedback" name="feedback" rows="3" maxlength="1000" required></textarea>
+                    <button class="btn btn-warning">Send back to In Progress</button>
+                </form>
+            </section>
+        }
+        else if (t.Status == TaskItemStatus.NeedsReview)
+        {
+            <section class="panel panel-muted">
+                <p class="mb-0">Submitted and waiting for a Team Leader to review.</p>
+            </section>
+        }
+        else if (t.Status == TaskItemStatus.Completed)
+        {
+            <section class="panel panel-done">
+                <p class="mb-0">Completed@(t.CompletedAt is { } c ? $" on {c.ToLocalTime():MMM d, yyyy}" : "").</p>
+            </section>
+        }
+
+        <section class="panel">
+            <h2 class="h6 text-uppercase text-body-secondary">Description</h2>
+            @if (string.IsNullOrWhiteSpace(t.Description))
+            {
+                <p class="text-body-secondary mb-0">No description.</p>
+            }
+            else
+            {
+                <p class="mb-0 preserve-lines">@t.Description</p>
+            }
+        </section>
+
+        <section class="panel">
+            <h2 class="h6 text-uppercase text-body-secondary">Files</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="small fw-semibold mb-1">Reference files</div>
+                    <partial name="_FileList" model="Model.References" />
+                    @if (Model.CanManage)
+                    {
+                        <form method="post" asp-action="AddReference" asp-route-id="@t.TaskId" enctype="multipart/form-data" class="mt-2 d-flex gap-2">
+                            <input class="form-control form-control-sm" type="file" name="files" multiple required aria-label="Add reference files" />
+                            <button class="btn btn-sm btn-outline-secondary">Add</button>
+                        </form>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <div class="small fw-semibold mb-1">Submitted deliverables</div>
+                    <partial name="_FileList" model="Model.Deliverables" />
+                </div>
+            </div>
+        </section>
+
+        <section class="panel" id="discussion">
+            <h2 class="h6 text-uppercase text-body-secondary">Discussion</h2>
+            @if (Model.Comments.Count == 0)
+            {
+                <p class="text-body-secondary">No messages yet. Ask a question or share an update.</p>
+            }
+            <ul class="comments">
+                @foreach (var c in Model.Comments)
+                {
+                    <li>
+                        <span class="avatar avatar-sm">@(c.Author?.Initials ?? "?")</span>
+                        <div>
+                            <div class="small"><strong>@(c.Author?.FullName ?? "Former member")</strong>
+                                <time class="text-body-secondary" datetime="@c.Comment.CreatedAt.ToString("o")">@c.Comment.CreatedAt.ToString("MMM d, h:mm tt")</time></div>
+                            <div class="preserve-lines">@c.Comment.MessageText</div>
+                        </div>
+                    </li>
+                }
+            </ul>
+            <form method="post" asp-action="Comment" asp-route-id="@t.TaskId">
+                <label for="message" class="visually-hidden">Message</label>
+                <textarea class="form-control mb-2" id="message" name="message" rows="2" maxlength="1000" placeholder="Write a message" required></textarea>
+                <button class="btn btn-outline-primary btn-sm">Post</button>
+            </form>
+        </section>
+    </div>
+
+    <div class="col-lg-4">
+        <section class="panel">
+            <dl class="details-list">
+                <dt>Project</dt>
+                <dd><a asp-controller="Projects" asp-action="Details" asp-route-id="@Model.Project.ProjectId">@Model.Project.ProjectName</a></dd>
+                <dt>Assigned to</dt>
+                <dd>
+                    @if (Model.Assignees.Count == 0) { <span class="text-body-secondary">Nobody yet</span> }
+                    @foreach (var a in Model.Assignees)
+                    {
+                        <div class="d-flex align-items-center gap-2 mb-1"><span class="avatar avatar-sm">@a.Initials</span> @a.FullName</div>
+                    }
+                </dd>
+                <dt>Created by</dt>
+                <dd>@(Model.Creator?.FullName ?? "Unknown") on @t.CreatedAt.ToString("MMM d")</dd>
+            </dl>
+        </section>
+
+        @if (Model.CanManage || (Model.IsAssignee && t.Status != TaskItemStatus.Completed))
+        {
+            <section class="panel">
+                <form method="post" asp-action="ChangeStatus" asp-route-id="@t.TaskId">
+                    <label for="status" class="form-label fw-semibold">Change status</label>
+                    <select class="form-select mb-2" id="status" name="status">
+                        @foreach (var s in statuses)
+                        {
+                            <option value="@s" selected="@(s == t.Status)">@s.DisplayName()</option>
+                        }
+                    </select>
+                    <button class="btn btn-outline-primary w-100">Update status</button>
+                    @if (!Model.CanManage)
+                    {
+                        <p class="small text-body-secondary mt-2 mb-0">Only Team Leaders can mark tasks as Completed.</p>
+                    }
+                </form>
+            </section>
+        }
+    </div>
+</div>

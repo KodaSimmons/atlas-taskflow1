@@ -1,0 +1,52 @@
+@model TaskListViewModel
+@inject CurrentUserContext Current
+@{
+    ViewData["Title"] = "Tasks";
+    var tabs = new (string Key, string Label)[] { ("mine", "My tasks"), ("pool", "Not assigned"), ("review", "Needs review"), ("all", "All team tasks") };
+}
+
+<div class="page-head">
+    <div>
+        <h1>Tasks</h1>
+        <p class="text-body-secondary mb-0">
+            @switch (Model.Filter)
+            {
+                case "pool": <text>Open work nobody has picked up yet. Pick one up to make it yours.</text> break;
+                case "review": <text>Work that's been submitted and is waiting for a leader's approval.</text> break;
+                case "all": <text>Everything in @Current.Team.TeamName.</text> break;
+                default: <text>Everything assigned to you, soonest due first.</text> break;
+            }
+        </p>
+    </div>
+    @if (Current.CanManage)
+    {
+        <a class="btn btn-primary" asp-action="Create">+ New task</a>
+    }
+</div>
+
+<ul class="nav nav-pills mb-3 flex-nowrap overflow-auto">
+    @foreach (var tab in tabs)
+    {
+        <li class="nav-item">
+            <a class="nav-link text-nowrap @(Model.Filter == tab.Key ? "active" : "")" asp-action="Index" asp-route-filter="@tab.Key">@tab.Label</a>
+        </li>
+    }
+</ul>
+
+<section class="panel">
+    @if (Model.Tasks.Count == 0)
+    {
+        <div class="empty-state">
+            <p class="mb-0">No tasks here.</p>
+        </div>
+    }
+    else
+    {
+        <div class="task-list">
+            @foreach (var card in Model.Tasks)
+            {
+                <partial name="_TaskRow" model="card" />
+            }
+        </div>
+    }
+</section>

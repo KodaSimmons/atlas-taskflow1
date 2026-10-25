@@ -1,8 +1,142 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model DashboardViewModel
+@inject CurrentUserContext Current
+@{
+    ViewData["Title"] = "Dashboard";
+    var firstName = Current.User.FullName.Split(' ')[0];
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="page-head">
+    <div>
+        <h1>Good to see you, @firstName</h1>
+        <p class="text-body-secondary mb-0">
+            @Current.Team.TeamName · @(Current.CanManage ? "Team Leader" : "Team Member")
+        </p>
+    </div>
+    @if (Current.CanManage)
+    {
+        <a class="btn btn-primary" asp-controller="Tasks" asp-action="Create">+ New task</a>
+    }
+</div>
+
+<div class="stat-row">
+    <a class="stat" asp-controller="Tasks" asp-action="Index" asp-route-filter="mine">
+        <span class="stat-value">@Model.MyTasks.Count</span><span class="stat-label">My open tasks</span>
+    </a>
+    @if (Current.CanManage)
+    {
+        <a class="stat" asp-controller="Tasks" asp-action="Index" asp-route-filter="review">
+            <span class="stat-value">@Model.ReviewQueue.Count</span><span class="stat-label">Waiting for review</span>
+        </a>
+    }
+    <a class="stat" asp-controller="Tasks" asp-action="Index" asp-route-filter="pool">
+        <span class="stat-value">@Model.PoolCount</span><span class="stat-label">Not assigned</span>
+    </a>
+    <div class="stat">
+        <span class="stat-value @(Model.OverdueCount > 0 ? "text-danger" : "")">@Model.OverdueCount</span><span class="stat-label">Overdue</span>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        @if (Current.CanManage && Model.ReviewQueue.Count > 0)
+        {
+            <section class="panel panel-highlight">
+                <div class="panel-head">
+                    <h2>Review queue</h2>
+                    <a asp-controller="Tasks" asp-action="Index" asp-route-filter="review">View all</a>
+                </div>
+                <div class="task-list">
+                    @foreach (var card in Model.ReviewQueue)
+                    {
+                        <partial name="_TaskRow" model="card" />
+                    }
+                </div>
+            </section>
+        }
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>My tasks</h2>
+                <span class="live-dot" title="Updates automatically">Live</span>
+            </div>
+            <div id="my-tasks" data-refresh-url="@Url.Action("MyTasksPanel", "Home")">
+                <partial name="_MyTasks" model="Model.MyTasks" />
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>@Model.Calendar.Month.ToString("MMMM yyyy")</h2>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Change month">
+                    <a class="btn btn-outline-secondary" asp-route-month="@Model.Calendar.PreviousMonthKey" aria-label="Previous month">&lsaquo;</a>
+                    <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Today</a>
+                    <a class="btn btn-outline-secondary" asp-route-month="@Model.Calendar.NextMonthKey" aria-label="Next month">&rsaquo;</a>
+                </div>
+            </div>
+            <div class="calendar" role="grid" aria-label="Task due dates">
+                @foreach (var dow in new[] { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" })
+                {
+                    <div class="calendar-dow" role="columnheader">@dow</div>
+                }
+                @foreach (var day in Model.Calendar.Days)
+                {
+                    <div class="calendar-day @(day.InMonth ? "" : "out") @(day.IsToday ? "today" : "")" role="gridcell">
+                        <div class="calendar-date">@day.Date.Day</div>
+                        @foreach (var card in day.Tasks.Take(2))
+                        {
+                            <a class="calendar-task status-@card.Task.Status.ToString().ToLowerInvariant()"
+                               asp-controller="Tasks" asp-action="Details" asp-route-id="@card.Task.TaskId"
+                               title="@card.Task.Title (@card.Task.Status.DisplayName())">@card.Task.Title</a>
+                        }
+                        @if (day.Tasks.Count > 2)
+                        {
+                            <span class="calendar-more">+@(day.Tasks.Count - 2) more</span>
+                        }
+                    </div>
+                }
+            </div>
+            <p class="small text-body-secondary mt-2 mb-0">
+                @(Current.CanManage ? "Showing due dates for the whole team." : "Showing due dates for your tasks.")
+            </p>
+        </section>
+    </div>
+
+    <div class="col-lg-5">
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Projects</h2>
+                <a asp-controller="Projects" asp-action="Index">All projects</a>
+            </div>
+            @foreach (var p in Model.Projects)
+            {
+                <a class="project-row" asp-controller="Projects" asp-action="Details" asp-route-id="@p.Project.ProjectId">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-semibold">@p.Project.ProjectName</span>
+                        <span class="small text-body-secondary">@p.OpenTasks open</span>
+                    </div>
+                    <div class="progress mt-2" role="progressbar" aria-label="@p.Project.ProjectName progress"
+                         aria-valuenow="@p.PercentComplete" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: @p.PercentComplete%"></div>
+                    </div>
+                </a>
+            }
+        </section>
+
+        <section class="panel">
+            <div class="panel-head"><h2>Recent activity</h2></div>
+            @if (Model.RecentActivity.Count == 0)
+            {
+                <p class="text-body-secondary mb-0">No activity yet.</p>
+            }
+            <ul class="activity">
+                @foreach (var a in Model.RecentActivity)
+                {
+                    <li>
+                        <span>@a.Message</span>
+                        <time class="small text-body-secondary" datetime="@a.CreatedAt.ToString("o")">@a.CreatedAt.ToLocalTime().ToString("MMM d, h:mm tt")</time>
+                    </li>
+                }
+            </ul>
+        </section>
+    </div>
 </div>

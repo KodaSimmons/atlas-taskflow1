@@ -1,0 +1,48 @@
+@model ProjectBoardViewModel
+@inject CurrentUserContext Current
+@{
+    ViewData["Title"] = Model.Project.ProjectName;
+}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">Projects</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Project.ProjectName</li>
+    </ol>
+</nav>
+<div class="page-head">
+    <div>
+        <h1>@Model.Project.ProjectName</h1>
+        <p class="text-body-secondary mb-0">@Model.Project.Description</p>
+    </div>
+    @if (Current.CanManage)
+    {
+        <a class="btn btn-primary" asp-controller="Tasks" asp-action="Create" asp-route-projectId="@Model.Project.ProjectId">+ New task</a>
+    }
+</div>
+
+<div class="board">
+    @foreach (var (status, cards) in Model.Columns)
+    {
+        <section class="board-column" aria-label="@status.DisplayName()">
+            <div class="board-column-head">
+                <partial name="_StatusBadge" model="status" />
+                <span class="text-body-secondary small">@cards.Count</span>
+            </div>
+            @foreach (var card in cards)
+            {
+                var overdue = card.Task.IsOverdue(DateTime.Today);
+                <a class="board-card" asp-controller="Tasks" asp-action="Details" asp-route-id="@card.Task.TaskId">
+                    <div class="fw-semibold">@card.Task.Title</div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="small @(overdue ? "text-danger fw-semibold" : "text-body-secondary")">@card.Task.DueDate.ToString("MMM d")</span>
+                        <partial name="_Avatars" model="card.Assignees" />
+                    </div>
+                </a>
+            }
+            @if (cards.Count == 0)
+            {
+                <div class="board-empty">No tasks</div>
+            }
+        </section>
+    }
+</div>

@@ -1,0 +1,17 @@
+@model IReadOnlyList<AttachmentView>
+@if (Model.Count == 0)
+{
+    <p class="small text-body-secondary mb-0">None yet.</p>
+}
+else
+{
+    <ul class="file-list">
+        @foreach (var f in Model)
+        {
+            <li>
+                <a asp-controller="Tasks" asp-action="Download" asp-route-id="@f.Attachment.AttachmentId">@f.Attachment.FileName</a>
+                <span class="small text-body-secondary">@(f.Uploader?.FullName ?? "Unknown") · @(f.Attachment.Content.Length < 1024 ? $"{f.Attachment.Content.Length} B" : $"{f.Attachment.Content.Length / 1024} KB")</span>
+            </li>
+        }
+    </ul>
+}

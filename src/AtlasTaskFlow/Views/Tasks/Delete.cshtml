@@ -1,0 +1,12 @@
+@model TaskCard
+@{
+    ViewData["Title"] = "Delete task";
+}
+<div class="page-head"><h1>Delete this task?</h1></div>
+<section class="panel form-panel">
+    <p><strong>@Model.Task.Title</strong> in @Model.ProjectName will be removed along with its discussion and files. This can't be undone.</p>
+    <form method="post" asp-action="Delete" asp-route-id="@Model.Task.TaskId" class="d-flex gap-2">
+        <button class="btn btn-danger">Delete task</button>
+        <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.Task.TaskId">Cancel</a>
+    </form>
+</section>

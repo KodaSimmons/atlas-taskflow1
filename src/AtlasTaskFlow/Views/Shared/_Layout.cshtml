@@ -1,49 +1,114 @@
-﻿<!DOCTYPE html>
+@inject CurrentUserContext Current
+@inject AtlasStore Store
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+    var unread = Store.GetUnreadCount(Current.User.UserId, Current.Team.TeamId);
+    string Active(string name) => controller == name ? "active" : "";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AtlasTaskFlow</title>
+    <title>@ViewData["Title"] · Atlas TaskFlow</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/AtlasTaskFlow.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AtlasTaskFlow</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+        <nav class="navbar navbar-expand-lg atlas-nav">
+            <div class="container-xl">
+                <a class="navbar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+                    <span class="atlas-logo" aria-hidden="true">A</span> Atlas TaskFlow
+                </a>
+
+                <div class="d-flex align-items-center gap-2 order-lg-last">
+                    <a class="btn btn-icon position-relative" asp-controller="Notifications" asp-action="Index"
+                       aria-label="Notifications, @unread unread" title="Notifications">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span id="bell-count" class="bell-count @(unread == 0 ? "d-none" : "")">@unread</span>
+                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-user dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Viewing as">
+                            <span class="avatar">@Current.User.Initials</span>
+                            <span class="d-none d-md-inline">@Current.User.FullName</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-2 shadow-sm">
+                            <div class="dropdown-header px-2">Viewing as (demo until sign-in in Sprint 6)</div>
+                            @foreach (var u in Current.AllUsers)
+                            {
+                                var role = Store.GetTeamsForUser(u.UserId)
+                                    .Select(t => Store.GetMembership(t.TeamId, u.UserId)!)
+                                    .Any(m => m.Role == TeamRole.Leader) ? "Team Leader" : "Team Member";
+                                <form method="post" asp-controller="Demo" asp-action="SwitchUser" class="m-0">
+                                    <input type="hidden" name="userId" value="@u.UserId" />
+                                    <button type="submit" class="dropdown-item rounded d-flex justify-content-between gap-3 @(u.UserId == Current.User.UserId ? "active" : "")">
+                                        <span>@u.FullName</span><small class="text-body-secondary">@role</small>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
+                <div class="collapse navbar-collapse" id="mainNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Tasks")" asp-controller="Tasks" asp-action="Index">Tasks</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Projects")" asp-controller="Projects" asp-action="Index">Projects</a></li>
+                        <li class="nav-item"><a class="nav-link @Active("Team")" asp-controller="Team" asp-action="Index">Team</a></li>
                     </ul>
+                    @* Persistent team badge so multi-team users always know which workspace they're in (Sprint 3 risk mitigation). *@
+                    <div class="dropdown me-lg-2 my-2 my-lg-0">
+                        <button class="btn team-badge dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                                @(Current.Teams.Count < 2 ? "disabled" : "")>
+                            <span class="text-body-secondary small">Team</span> <strong>@Current.Team.TeamName</strong>
+                        </button>
+                        <div class="dropdown-menu p-2 shadow-sm">
+                            @foreach (var t in Current.Teams)
+                            {
+                                <form method="post" asp-controller="Demo" asp-action="SwitchTeam" class="m-0">
+                                    <input type="hidden" name="teamId" value="@t.TeamId" />
+                                    <button type="submit" class="dropdown-item rounded @(t.TeamId == Current.Team.TeamId ? "active" : "")">@t.TeamName</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - AtlasTaskFlow - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main role="main" class="container-xl py-4">
+        @if (TempData["Success"] is string ok)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="status">
+                @ok <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] is string err)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @err <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="atlas-footer">
+        <div class="container-xl d-flex flex-wrap justify-content-between gap-2">
+            <span>Atlas TaskFlow · Sprint 4 build</span>
+            <span>Sample data resets when the app restarts.</span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true" data-summary-url="@Url.Action("Summary", "Notifications")"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

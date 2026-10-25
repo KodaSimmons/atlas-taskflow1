@@ -1,0 +1,27 @@
+@model ProjectFormViewModel
+@{
+    ViewData["Title"] = "New project";
+}
+<div class="page-head"><h1>New project</h1></div>
+<section class="panel form-panel">
+    <form method="post" asp-action="Create" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+        <div class="mb-3">
+            <label asp-for="ProjectName" class="form-label"></label>
+            <input asp-for="ProjectName" class="form-control" autofocus />
+            <span asp-validation-for="ProjectName" class="text-danger small"></span>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            <span asp-validation-for="Description" class="text-danger small"></span>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-primary">Create project</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+        </div>
+    </form>
+</section>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

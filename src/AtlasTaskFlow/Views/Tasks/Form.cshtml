@@ -1,0 +1,71 @@
+@model TaskFormViewModel
+@{
+    var isEdit = Model.TaskId.HasValue;
+    ViewData["Title"] = isEdit ? "Edit task" : "New task";
+}
+
+<div class="page-head">
+    <h1>@ViewData["Title"]</h1>
+</div>
+
+<section class="panel form-panel">
+    <form method="post" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.TaskId" novalidate>
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control" autofocus />
+            <span asp-validation-for="Title" class="text-danger small"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Description" class="text-danger small"></span>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-sm-6">
+                <label asp-for="ProjectId" class="form-label"></label>
+                <select asp-for="ProjectId" class="form-select"
+                        asp-items="@(new SelectList(Model.ProjectOptions, nameof(Project.ProjectId), nameof(Project.ProjectName)))">
+                </select>
+                <span asp-validation-for="ProjectId" class="text-danger small"></span>
+            </div>
+            <div class="col-sm-6">
+                <label asp-for="DueDate" class="form-label"></label>
+                <input asp-for="DueDate" class="form-control" type="date" />
+                <span asp-validation-for="DueDate" class="text-danger small"></span>
+            </div>
+        </div>
+
+        <fieldset class="mb-4">
+            <legend class="form-label fs-6">Assign to <span class="text-body-secondary small">(pick none to leave it in the Not Assigned pool)</span></legend>
+            <div class="assignee-grid">
+                @foreach (var u in Model.MemberOptions)
+                {
+                    <label class="assignee-option">
+                        <input type="checkbox" class="form-check-input" name="AssigneeIds" value="@u.UserId" checked="@Model.AssigneeIds.Contains(u.UserId)" />
+                        <span class="avatar avatar-sm">@u.Initials</span> @u.FullName
+                    </label>
+                }
+            </div>
+        </fieldset>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">@(isEdit ? "Save changes" : "Create task")</button>
+            @if (isEdit)
+            {
+                <a class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@Model.TaskId">Cancel</a>
+            }
+            else
+            {
+                <a class="btn btn-outline-secondary" asp-action="Index">Cancel</a>
+            }
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

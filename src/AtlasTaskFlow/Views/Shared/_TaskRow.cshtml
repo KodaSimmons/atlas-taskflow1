@@ -1,0 +1,19 @@
+@model TaskCard
+@{
+    var overdue = Model.Task.IsOverdue(DateTime.Today);
+}
+<a class="task-row" asp-controller="Tasks" asp-action="Details" asp-route-id="@Model.Task.TaskId">
+    <div class="task-row-main">
+        <div class="task-title">@Model.Task.Title</div>
+        <div class="task-meta">
+            <span>@Model.ProjectName</span>
+            <span class="@(overdue ? "text-danger fw-semibold" : "")">
+                @(overdue ? "Overdue · " : "Due ")@Model.Task.DueDate.ToString("MMM d")
+            </span>
+        </div>
+    </div>
+    <div class="task-row-side">
+        <partial name="_Avatars" model="Model.Assignees" />
+        <partial name="_StatusBadge" model="Model.Task.Status" />
+    </div>
+</a>

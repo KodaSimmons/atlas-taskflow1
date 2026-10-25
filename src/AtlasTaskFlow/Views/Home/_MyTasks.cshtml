@@ -1,0 +1,17 @@
+@model IReadOnlyList<TaskCard>
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <p class="mb-2">Nothing assigned to you right now.</p>
+        <a asp-controller="Tasks" asp-action="Index" asp-route-filter="pool">Browse the Not Assigned pool</a>
+    </div>
+}
+else
+{
+    <div class="task-list">
+        @foreach (var card in Model)
+        {
+            <partial name="_TaskRow" model="card" />
+        }
+    </div>
+}
