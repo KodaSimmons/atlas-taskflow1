@@ -149,7 +149,9 @@ public class TasksController : AtlasController
     [HttpPost]
     public IActionResult ChangeStatus(int id, TaskItemStatus status)
     {
-        if (!Enum.IsDefined(status))
+        // An unknown value fails model binding and leaves status at its default (Not Assigned),
+        // so check ModelState as well as the value itself.
+        if (!ModelState.IsValid || !Enum.IsDefined(status))
         {
             FlashError("That isn't a valid status.");
             return RedirectToAction(nameof(Details), new { id });
