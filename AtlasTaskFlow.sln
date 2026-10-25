@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6D48CD93-A354-45C2-BB5D-C981D83BE9A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasTaskFlow", "src\AtlasTaskFlow\AtlasTaskFlow.csproj", "{01FD0A55-E7DC-4A94-9780-06D74347EFEB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1481D05A-4618-42CE-B519-ADC636EFFADE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AtlasTaskFlow.Tests", "tests\AtlasTaskFlow.Tests\AtlasTaskFlow.Tests.csproj", "{DD5CBB04-8DB9-49EF-9076-4CB87B2C44EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{01FD0A55-E7DC-4A94-9780-06D74347EFEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01FD0A55-E7DC-4A94-9780-06D74347EFEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01FD0A55-E7DC-4A94-9780-06D74347EFEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01FD0A55-E7DC-4A94-9780-06D74347EFEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD5CBB04-8DB9-49EF-9076-4CB87B2C44EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD5CBB04-8DB9-49EF-9076-4CB87B2C44EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD5CBB04-8DB9-49EF-9076-4CB87B2C44EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD5CBB04-8DB9-49EF-9076-4CB87B2C44EC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{01FD0A55-E7DC-4A94-9780-06D74347EFEB} = {6D48CD93-A354-45C2-BB5D-C981D83BE9A4}
+		{DD5CBB04-8DB9-49EF-9076-4CB87B2C44EC} = {1481D05A-4618-42CE-B519-ADC636EFFADE}
+	EndGlobalSection
+EndGlobal
