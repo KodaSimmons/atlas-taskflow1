@@ -35,8 +35,8 @@ Owner: Koda Simmons · Last updated: 2026-10-25
 
 ## §2 Where we are
 
-Sprint 4. The code is on GitHub and CI is green. The Azure App Service exists, and the first deployment is running
-([PLAN-001](plans/PLAN-001-working-cloud-app.md)).
+Sprint 4. The code is on GitHub and CI is green. The app is live on Azure and passed the automated smoke test. Koda's manual live checks and
+reflection remain ([PLAN-001](plans/PLAN-001-working-cloud-app.md)).
 
 ## §3 Where we're going
 

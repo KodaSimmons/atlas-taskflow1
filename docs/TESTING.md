@@ -79,7 +79,18 @@ The deploy job checks the live site automatically after every deployment:
 | `/Team` | 200, shows "Brightside Marketing" |
 | `/Tasks/Details/999999` | 404 |
 
-**Manual checks on the live site** (fill in after the first deploy):
+**First deployment, 2026-10-25** ([workflow run](https://github.com/kodasimmons59-prog/atlas-taskflow/actions/runs/40232502012), commit `d1ba462`), against <https://atlas-taskflow-koda-d8gjabatgvatgtcj.northcentralus-01.azurewebsites.net>:
+
+| Check | Result |
+| --- | --- |
+| `/health` | 200 Healthy |
+| `/` | 200 |
+| `/Tasks` | 200 |
+| `/Projects` | 200 |
+| `/Team` | 200 |
+| `/Tasks/Details/999999` | 404 as expected |
+
+**Manual checks on the live site** (fill these in yourself in a browser):
 
 | Check | Result | Date |
 | --- | --- | --- |

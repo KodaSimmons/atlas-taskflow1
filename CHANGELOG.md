@@ -5,6 +5,7 @@ Notable changes to Atlas TaskFlow and its roadmap, newest first.
 ## 2026-10-25
 
 ### Added
+- First Azure deployment, live at https://atlas-taskflow-koda-d8gjabatgvatgtcj.northcentralus-01.azurewebsites.net; smoke test passed.
 - Azure App Service `atlas-taskflow-koda` (North Central US) and the GitHub deploy settings; PLAN-001 is `ACTIVE` again.
 - Deployment guide notes on Azure for Students region and resource group limits.
 - Roadmap system based on Yardgoat Caboose: `roadmap/ROADMAP.md`, plans PLAN-001 to PLAN-005, decision records

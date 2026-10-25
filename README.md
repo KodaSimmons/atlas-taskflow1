@@ -4,7 +4,7 @@ Atlas TaskFlow is a task manager for small business teams. Team leaders create a
 closed out; team members see what's on their plate, pick up open work, and submit deliverables. This repository is the
 Sprint 4 build: the first working, cloud-hosted version of the Sprint 3 Product Design Package.
 
-**Live app:** _add your Azure URL here after the first deploy_ (for example `https://atlas-taskflow-koda.azurewebsites.net`)
+**Live app:** <https://atlas-taskflow-koda-d8gjabatgvatgtcj.northcentralus-01.azurewebsites.net>
 
 ## Try it
 
