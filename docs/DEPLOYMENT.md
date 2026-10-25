@@ -11,12 +11,15 @@ You need an Azure account. [Azure for Students](https://azure.microsoft.com/free
 
 1. In the [Azure portal](https://portal.azure.com), choose **Create a resource > Web App**.
 2. Fill in:
-   - **Resource group:** create one, e.g. `atlas-taskflow-rg`
+   - **Resource group:** create one, e.g. `atlas-taskflow-rg`. If your school manages the subscription and you can't
+     create one, choose **Select existing** and use the group you were given
    - **Name:** something unique, e.g. `atlas-taskflow-koda`. This becomes `https://<name>.azurewebsites.net`
    - **Publish:** Code
    - **Runtime stack:** .NET 8 (LTS)
    - **Operating system:** Linux
-   - **Region:** one close to you
+   - **Region:** one your subscription allows. Azure for Students only permits some regions; if you get "disallowed by
+     Azure", try another (North Central US worked for this project), or check **Policy > Assignments > Allowed
+     resource deployment regions** for the list
    - **Pricing plan:** Free F1 is enough for this sprint
 3. Click **Review + create**, then **Create**.
 

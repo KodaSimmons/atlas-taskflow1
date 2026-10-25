@@ -35,8 +35,8 @@ Owner: Koda Simmons · Last updated: 2026-10-25
 
 ## §2 Where we are
 
-Sprint 4. The app, tests, deploy workflow and evidence docs are built ([PLAN-001](plans/PLAN-001-working-cloud-app.md)).
-It is waiting on two owner steps: GitHub access for the push, and the one-time Azure setup.
+Sprint 4. The code is on GitHub and CI is green. The Azure App Service exists, and the first deployment is running
+([PLAN-001](plans/PLAN-001-working-cloud-app.md)).
 
 ## §3 Where we're going
 
@@ -47,7 +47,7 @@ and the Version 1.0 release (Sprint 8). Each is a `HORIZON` plan in §4 until it
 
 | Plan | Title | Sprint | Status |
 | --- | --- | --- | --- |
-| [PLAN-001](plans/PLAN-001-working-cloud-app.md) | Working cloud application | 4 | `BLOCKED` |
+| [PLAN-001](plans/PLAN-001-working-cloud-app.md) | Working cloud application | 4 | `ACTIVE` |
 | [PLAN-002](plans/PLAN-002-persistent-data.md) | Persistent data on Azure SQL and Blob Storage | 5 | `HORIZON` |
 | [PLAN-003](plans/PLAN-003-security-and-sign-in.md) | Sign-in, invitations and authorization | 6 | `HORIZON` |
 | [PLAN-004](plans/PLAN-004-production-readiness.md) | Production readiness | 7 | `HORIZON` |

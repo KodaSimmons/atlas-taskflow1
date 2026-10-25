@@ -1,6 +1,6 @@
 # PLAN-001 Working cloud application
 
-Status: `BLOCKED` · Sprint 4 · Source: Assignment 4 brief
+Status: `ACTIVE` · Sprint 4 · Source: Assignment 4 brief
 
 ## Goal
 
@@ -20,9 +20,9 @@ Out (see later plans): database, sign-in, email.
 | Build the app with models, controllers and views | Done (`00e7324`..`c807c80`) |
 | Unit and integration tests | Done, 44 passing (`998dd09`) |
 | Deploy workflow, smoke test, docs and screenshots | Done (`1b4f71e`) |
-| Push to `kodasimmons59-prog/atlas-taskflow` | Blocked: the Claude GitHub App is not installed on the repo |
-| Create the Azure App Service and add the deploy secret | Waiting on Koda ([DEPLOYMENT.md](../../docs/DEPLOYMENT.md)) |
-| First deploy and live checks | After the two steps above ([TESTING.md](../../docs/TESTING.md) §3) |
+| Push to `kodasimmons59-prog/atlas-taskflow` | Done (`1d77b71`), first CI run green |
+| Create the Azure App Service and add the deploy secret | Done: `atlas-taskflow-koda`, North Central US, Linux, Free F1 |
+| First deploy and live checks | In progress ([TESTING.md](../../docs/TESTING.md) §3) |
 | Reflection | Koda writes it |
 
 ## Decisions

@@ -5,6 +5,8 @@ Notable changes to Atlas TaskFlow and its roadmap, newest first.
 ## 2026-10-25
 
 ### Added
+- Azure App Service `atlas-taskflow-koda` (North Central US) and the GitHub deploy settings; PLAN-001 is `ACTIVE` again.
+- Deployment guide notes on Azure for Students region and resource group limits.
 - Roadmap system based on Yardgoat Caboose: `roadmap/ROADMAP.md`, plans PLAN-001 to PLAN-005, decision records
   DR-0001 to DR-0005, owner rulings OV-001 to OV-003, `CLAUDE.md` working rules, and `scripts/roadmap-lint.py`, which
   now runs in CI.
