@@ -94,10 +94,10 @@ The deploy job checks the live site automatically after every deployment:
 
 | Check | Result | Date |
 | --- | --- | --- |
-| Live URL loads over HTTPS | | |
-| Create a task as Sarah and assign it to Marcus | | |
-| As Marcus: start, upload a file, submit for review | | |
-| As Marcus: try to mark Completed and see the block message | | |
-| As Sarah: open the notification and approve | | |
-| Switch Marcus to Corner Bakery Co. and confirm only its tasks show | | |
-| Open the site on a phone | | |
+| Live URL loads over HTTPS |Pass |10/25/26 |
+| Create a task as Sarah and assign it to Marcus |Pass |10/25/26 |
+| As Marcus: start, upload a file, submit for review |Pass |10/25/26 |
+| As Marcus: try to mark Completed and see the block message |Pass |10/25/26 |
+| As Sarah: open the notification and approve |Pass |10/25/26 |
+| Switch Marcus to Corner Bakery Co. and confirm only its tasks show |Pass |10/25/26 |
+| Open the site on a phone |Fail |10/25/26 |
