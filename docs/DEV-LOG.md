@@ -43,9 +43,9 @@ the first team is 5. The tests now look teams and people up by name instead of h
 
 ## 5. Cookies in integration tests
 
-The demo user and team cookies are marked `Secure`. The test client's default address is `http://localhost`, where
-secure cookies aren't sent back, so switching users in a test would have had no effect. The test client uses
-`https://localhost` instead.
+The demo user and team cookies are marked `Secure`, and browsers and the test client only send secure cookies back over
+HTTPS. The test client's default address is `http://localhost`, so it was set to `https://localhost`; otherwise switching
+users inside a test would not stick.
 
 ## 6. Small UI fixes from the walkthrough
 
